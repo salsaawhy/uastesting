@@ -33,7 +33,7 @@ jobs:
 
       - name: Run Tests in Parallel
         run: |
-          pytest -n 3 --maxfail=1 --disable-warnings
+          pytest -n 3 --maxfail=1 --disable-warnings --junitxml=pytest-report.xml
 
       - name: Upload Test Results
         if: failure()
