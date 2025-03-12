@@ -1,4 +1,4 @@
-name: Selenium Test with Pytest
+name: Selenium Tests
 
 on:
   push:
@@ -9,38 +9,35 @@ on:
       - main
 
 jobs:
-  selenium-tests:
+  selenium_tests:
     runs-on: ubuntu-latest
     services:
       selenium:
         image: selenium/standalone-chrome:latest
-        options: >-
-          --publish 5555:4444  # Menggunakan port 5555 pada host
+        options: --shm-size=2g
         ports:
-          - 5555:4444  # Port 4444 di dalam container, dipetakan ke 5555 di host
-        env:
-          SCREEN_WIDTH: 1920
-          SCREEN_HEIGHT: 1080
-          SCREEN_DEPTH: 24
+          - 4444:4444
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.8
+          python-version: 3.9
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Selenium Tests
+      - name: Run Tests in Parallel
         run: |
-          pytest --maxfail=1 --disable-warnings -q
+          pytest -n 3 --maxfail=1 --disable-warnings
 
-      - name: Clean up
-        run: |
-          docker ps -q | xargs -r docker stop
-          docker ps -aq | xargs -r docker rm
+      - name: Upload Test Results
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: pytest-results
+          path: pytest-report.xml
