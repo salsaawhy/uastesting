@@ -3,10 +3,15 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 
-# Inisialisasi WebDriver
+# Konfigurasi WebDriver untuk Selenium Grid (menggunakan Docker)
 options = webdriver.ChromeOptions()
 options.add_experimental_option("detach", True)
-driver = webdriver.Chrome(options=options)
+
+# Pastikan menggunakan URL yang mengarah ke Selenium Grid yang berjalan di localhost:4444
+driver = webdriver.Remote(
+    command_executor='http://localhost:4444/wd/hub',  # URL Selenium Grid di Docker
+    options=options
+)
 
 # Buka halaman index.php
 driver.get("http://localhost/uas/index.php")
